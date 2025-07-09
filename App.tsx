@@ -1,10 +1,18 @@
 import { View, Text, PermissionsAndroid, Alert } from 'react-native'
 import React, { useEffect } from 'react'
+import BootSplash from "react-native-bootsplash";
 import messaging from '@react-native-firebase/messaging';
-import notifee from '@notifee/react-native';
+import notifee,{AndroidStyle} from '@notifee/react-native';
 
 const App = () => {
+
   useEffect(() => {
+    const init = async () => {
+      // …do multiple sync or async tasks
+    };
+    init().finally(async () => {
+      await BootSplash.hide({ fade: true });
+    });
     requestAndroidPermissions();
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
@@ -36,9 +44,10 @@ const App = () => {
 
     // Create a channel (required for Android)
     const channelId = await notifee.createChannel({
-      id: 'default',
+      id: 'sound',
       name: 'Default Channel',
     });
+    const image = remoteMessage.data?.image;
 
     // Display a notification
     await notifee.displayNotification({
@@ -46,7 +55,13 @@ const App = () => {
       body: remoteMessage.notification.body,
       android: {
         channelId,
+        smallIcon: 'ic_notification',
         sound: 'snapnotifi',
+        largeIcon: image,
+        // style: {
+        //   type: AndroidStyle.BIGPICTURE,
+        //   picture: image, // same image
+        // },
         pressAction: {
           id: 'default',
         },
